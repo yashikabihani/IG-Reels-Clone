@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import VideoCard from './VideoCard';
+import db from "./firebase";
 
 function App() {
+  const [reels, setReels] = useState([]);
+
+  useEffect(() => {
+    db.collection('reels').onSnapshot(snapshot => {
+      setReels(snapshot.docs.map(doc => doc.data))
+    })
+  }, [])
   return (
     // BEM naming convention
     <div className="app">
@@ -17,14 +25,16 @@ function App() {
 
       {/* {Scrollable Container of Videos} */}
       <div className="app__videos">
-        <VideoCard 
-          channel="BhavyaBihani"
-          avatarSrc="logo92.png"
-          song="Sanu Kehndi"
-          url='VID_20200505_124033.mp4'
-          likes={950}
-          shares={35}/>
-        <VideoCard />
+        {reels.map(({url, likes, shares, channel, avatarSrc, song}) => (
+          <VideoCard 
+            channel={channel}
+            avatarSrc={avatarSrc}
+            song={song}
+            url={url}
+            likes={likes}
+            shares={shares}
+          />
+        ))}
       </div>
     </div>
   );
